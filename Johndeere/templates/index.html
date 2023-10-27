@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>Previsão de Vida Útil</title>
+</head>
+<body>
+    <div style="position: relative;">
+        <img src="/static/logo-johndeere.png" alt="" style="width: 200px; height: auto; position: absolute; top: -25px; left: 4px;">
+      </div>
+    <h1>Previsão de Vida Útil de Peças de Veículos</h1>
+    <form id="form">
+        <label for="tipo_peca">Tipo de Peça:</label>
+        <select id="tipo_peca" name="tipo_peca">
+            <option value="Filtros de Ar e Óleo">Filtros de Ar e Óleo</option>
+            <option value="Pastilhas de Freio">Pastilhas de Freio</option>
+            <option value="Bateria">Bateria</option>
+            <option value="Correias de Transmissão">Correias de Transmissão</option>
+        </select>
+        <br>
+        <label for="quantidade_manutencao">Quantidade de Manutenções:</label>
+        <input class="input-field" type="number" id="quantidade_manutencao" name="quantidade_manutencao">
+        <br>
+        <label for="tempo_funcionamento">Tempo de Funcionamento (horas):</label>
+        <input class="input-field" type="number" id="tempo_funcionamento" name="tempo_funcionamento">
+        <br>
+        <label for="modelo_veiculo">Modelo do Trator:</label>
+        <select id="modelo_veiculo" name="modelo_veiculo">
+            <option value="HPX615E">HPX615E</option>
+            <option value="HPX815E">HPX815E</option>
+            <option value="TE 4x2 ELECTRIC">TE 4x2 ELECTRIC</option>
+            <option value="TH 6x4 DIESEL">TH 6x4 DIESEL</option>
+        </select>
+        <br>
+        <button type="button" onclick="fazerPrevisao()">Prever Vida Útil</button>
+    </form>
+    <div id="resultado">
+        <h2>Resultado da Previsão</h2>
+        <p>Vida Útil Estimada: <span id="vida_util_prevista"></span> horas</p>
+        <p>Tempo Restante de Funcionamento Estimado: <span id="tempo_restante"></span> horas</p>
+    </div>
+
+    <div id="aviso-troca">
+        <h2>Aviso!</h2>
+        <h3>Caso o resultado seja  negativo</h3>
+        <p>Já passou da hora de trocar a peça! uma vez que a vida útil estimada já se esgotou, especialmente quando os resultados indicam desempenho negativo, a fim de garantir a segurança contínua do veículo.</p>
+    </div>
+
+    <script>
+    
+        function fazerPrevisao() {
+            var tipo_peca = document.getElementById("tipo_peca").value;
+            var quantidade_manutencao = document.getElementById("quantidade_manutencao").value;
+            var tempo_funcionamento = document.getElementById("tempo_funcionamento").value;
+            var modelo_veiculo = document.getElementById("modelo_veiculo").value;
+
+            var data = {
+                "tipo_peca": tipo_peca,
+                "quantidade_manutencao": parseInt(quantidade_manutencao),
+                "tempo_funcionamento": parseInt(tempo_funcionamento),
+                "modelo_veiculo": modelo_veiculo
+            };
+
+            fetch("/fazer_previsao", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("vida_util_prevista").textContent = data.vida_util_prevista;
+                document.getElementById("tempo_restante").textContent = data.tempo_restante;
+            })
+            .catch(error => console.error(error));
+        }
+    </script>
+</body>
+</html>
